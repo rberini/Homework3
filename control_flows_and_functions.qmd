@@ -1,0 +1,112 @@
+---
+title: "Control Flows and Functions"
+format: html
+editor: visual
+---
+
+## Control Flow Practice
+
+Load file with list from Homework 2
+
+```{r}
+load("hw2_list.rda")
+bp_list
+```
+
+Create a new column in each data frame from above called `status`
+
+```{r}
+bp_list$treatment$status <- character(20)
+bp_list$placebo$status <- character(10)
+str(bp_list)
+```
+
+For the `treatment` data frame (within the list), create a `for` loop and use `if/then/else` logic to create the `status` column’s values
+
+```{r}
+for(i in 1:length(bp_list$treatment$status)) {
+  if(bp_list$treatment$post_bp[i] <= 120) {
+    bp_list$treatment$status[i] <- "optimal"
+  } else if (bp_list$treatment$post_bp[i] > 130) {
+    bp_list$treatment$status[i] <- "high"
+  } else if (bp_list$treatment$post_bp[i] > 120 & bp_list$treatment$post_bp[i] <= 130) {
+    bp_list$treatment$status[i] <- "borderline"
+  } else {
+    bp_list$treatment$status[i] <- NA
+  }
+}
+bp_list$treatment
+```
+
+For the `placebo` data frame (within the list), create a `for` loop and use `if/then/else` logic to create the `status` column’s values
+
+```{r}
+for(i in 1:length(bp_list$placebo$status)) {
+  if(bp_list$placebo$post_bp[i] <= 120) {
+    bp_list$placebo$status[i] <- "optimal"
+  } else if (bp_list$placebo$post_bp[i] > 130) {
+    bp_list$placebo$status[i] <- "high"
+  } else if (bp_list$placebo$post_bp[i] > 120 & bp_list$placebo$post_bp[i] <= 130) {
+    bp_list$placebo$status[i] <- "borderline"
+  } else {
+    bp_list$placebo$status[i] <- NA
+  }
+}
+bp_list$placebo
+```
+
+## Function Writing
+
+Write a function that does the following:
+
+-   Takes in a list with two data frames in it (a `treatment` and a `placebo` data frame) as one argument
+-   Takes a statistic as another argument with a default value of "mean"
+-   Finds the statistic of interest for `pre`, `post`, and `diff` columns of both data frames
+-   Returns these six values as a named list with meaningful names
+
+```{r}
+experiment_stats <- function(df_list, stat = "mean") {
+  statistic_all <- list()
+  for (df in names(df_list)) {
+    statistic <- vector()
+    for (col in names(df_list[[df]])) {
+      if(is.numeric(df_list[[df]][[col]])) {
+        statistic <- append(statistic, get(stat)(df_list[[df]][[col]]));
+        names(statistic)[length(statistic)] <- paste(col, stat, sep = "_")
+        }
+    }
+    statistic_all[[df]] <- statistic
+  }
+  return(statistic_all)
+}
+```
+
+Use the function `experiment_stats` on `bp_list` without specifying a statistic
+
+```{r}
+experiment_stats(bp_list)
+```
+
+Use the function `experiment_stats` on `bp_list`, specifying `var` as statistic
+
+```{r}
+experiment_stats(bp_list, "var")
+```
+
+Use the function `experiment_stats` on `bp_list`, specifying `sd` as statistic
+
+```{r}
+experiment_stats(bp_list, "sd")
+```
+
+Use the function `experiment_stats` on `bp_list`, specifying `min` as statistic
+
+```{r}
+experiment_stats(bp_list, "min")
+```
+
+Use the function `experiment_stats` on `bp_list`, specifying `max` as statistic
+
+```{r}
+experiment_stats(bp_list, "max")
+```
